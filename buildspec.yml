@@ -26,7 +26,7 @@ phases:
       - cfn_nag_scan --input-path `python3 get_value.py -c  ./config.yml -k template`
       - echo cfn-lint completed on `date`
       - echo cfn-nag start on `date`
-      - cfn-guard check -t `python3 get_value.py -c  ./config.yml -k template` -r ./rule.ruleset
+      - cfn-guard validate -d `python3 get_value.py -c  ./config.yml -k template` -r ./rule.ruleset
       - echo cfn-nag completed on `date`
       - echo taskcat start on `date`
       - taskcat test run
