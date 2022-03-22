@@ -41,9 +41,8 @@ def find_cfn_files(base_folder_path: str):
     filepath_list.extend(list(glob.glob(os.path.join(base_folder_path + "/**/*.template"), recursive=True)))
     return filepath_list
 
-def upload_cfn(input_path: str):
+def upload_cfn(bucket_name:str, input_path: str):
     
-    bucket_name = create_s3()
     filepath_list = find_cfn_files(str(Path(input_path).parent))
     upload_file_to_s3(bucket_name, filepath_list, str(Path(input_path).parent))
     return get_public_url(bucket_name, Path(input_path).name), bucket_name
@@ -148,7 +147,7 @@ def main():
     config['created']['bucket_name'] = bucket_name
     filepath_list = find_cfn_files(str(Path(config['template']).parent))
     for filepath in filepath_list:
-        upload_cfn(filepath)
+        upload_cfn(bucket_name, filepath)
     param_dict = generate_parameter(config['parameter'], args.s3_bucket_url_parameter_key_name, bucket_name)
     create_taskcat_file(config, param_dict)
 
