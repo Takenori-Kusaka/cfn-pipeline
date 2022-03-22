@@ -34,9 +34,10 @@ phases:
     commands:
       - echo taskcat completed on `date`
       - echo deploy start on `date`
-      - cfn-exec -n example-stack -i `python3 get_value.py -c  ./config.yml -k template` -p `python3 get_value.py -c  ./config.yml -k parameter`
+      - cfn-exec -n `python3 get_value.py -c  ./config.yml -k name` -i `python3 get_value.py -c  ./config.yml -k template` -p `python3 get_value.py -c  ./config.yml -k parameter`
   post_build:
     commands:
       - echo deploy completed on `date`
       - echo close on `date`
-      - python3 close.py -c ./config.yml
+      # - python3 close.py -c ./config.yml
+      - yes | bash delete-s3bucket.sh `python3 get_value.py -c  ./config.yml -k name`*

@@ -143,7 +143,7 @@ def main():
         config = yaml.safe_load(f)
 
     bucket_name = create_s3(config['name'])
-    config['created']['bucket_name'] = bucket_name
+    config['bucket_name'] = bucket_name
     filepath_list = find_cfn_files(str(Path(config['template']).parent))
     for filepath in filepath_list:
         upload_cfn(bucket_name, filepath)

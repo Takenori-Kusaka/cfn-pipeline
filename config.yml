@@ -2,9 +2,7 @@
 name: stack-name
 template: ./cfn/input/main.yml
 parameter: ./cfn/param.yml
-created:
-  stack_name: ''
-  bucket_name: ''
+bucket_name: ''
 taskcat:
   template: ''
   regions: 
