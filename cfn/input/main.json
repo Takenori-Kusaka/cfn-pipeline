@@ -1,0 +1,26 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "main.yml",
+  "Parameters": {
+    "TemplateS3BucketURL": {
+      "Description": "Referenced S3 bucket URL",
+      "Type": "String",
+      "Default": "TemplateS3BucketURL"
+    },
+    "BucketName": {
+      "Type": "String",
+      "Default": "BucketName"
+    }
+  },
+  "Resources": {
+    "S3": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {"Fn::Sub": "${TemplateS3BucketURL}/components/s3.yml"},
+        "Parameters": {
+          "BucketName": {"Ref": "BucketName"}
+        }
+      }
+    }
+  }
+}

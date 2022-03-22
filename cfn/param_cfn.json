@@ -1,0 +1,10 @@
+[
+  {
+    "ParameterKey": "TemplateS3BucketURL",
+    "ParameterValue": "TemplateS3BucketURL"
+  },
+  {
+    "ParameterKey": "BucketName",
+    "ParameterValue": "cfnexec-example-test-01234567890123456789"
+  }
+]

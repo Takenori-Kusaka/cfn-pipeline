@@ -1,0 +1,169 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Build CodeCommit & CodeBuild for cloudformation.
+Parameters:
+  RepositoryName:
+    Type: String
+    Default: my-repo
+    Description: CodeCommit repository name.
+Resources:
+  CodeCommit:
+    Type: "AWS::CodeCommit::Repository"
+    Properties:
+      RepositoryDescription: When commited run cloudformation.
+      RepositoryName: !Ref "RepositoryName"
+  CodeBuild:
+    Type: "AWS::CodeBuild::Project"
+    Properties:
+      Name: cloudformation
+      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: "aws/codebuild/amazonlinux2-x86_64-standard:3.0"
+        PrivilegedMode: False
+      Source:
+        Location: !GetAtt CodeCommit.CloneUrlHttp
+        Type: CODECOMMIT
+  CodeBuildServiceRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: cloudformation-codebuild
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "codebuild.amazonaws.com"
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess
+      - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+      - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+      Policies:
+        -
+          PolicyName: "CodeBuild-AdditionalPolicy"
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Effect: Allow
+              Resource:
+                - !Join [':', ['arn:aws:logs', !Ref "AWS::Region", !Ref "AWS::AccountId", 'log-group:/aws/codebuild/cloudformation']]
+                - !Join [':', ['arn:aws:logs', !Ref "AWS::Region", !Ref "AWS::AccountId", 'log-group:/aws/codebuild/cloudformation', '*']]
+              Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            - Effect: Allow
+              Resource:
+                - !Join ['', ['arn:aws:s3:::', !Ref 'PipelineBucket', /*]]
+              Action:
+              - s3:PutObject
+              - s3:GetObject
+              - s3:GetObjectVersion
+            - Effect: Allow
+              Resource:
+                - !Join [':', ['arn:aws:codecommit', !Ref "AWS::Region", !Ref "AWS::AccountId", !Ref "RepositoryName"]]
+              Action:
+              - codecommit:GitPull
+  CodePipelineServiceRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: cloudformation-codepipeline
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "codepipeline.amazonaws.com"
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/AWSCodePipelineFullAccess
+      - arn:aws:iam::aws:policy/AWSCodeCommitReadOnly
+      - arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess
+      Policies:
+        -
+          PolicyName: "CodePipeline-AdditionalPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action:
+                  - "codebuild:BatchGetBuilds"
+                  - "codebuild:StartBuild"
+                  - "codecommit:UploadArchive"
+                  - "s3:GetObject"
+                  - "s3:GetObjectVersion"
+                  - "s3:GetBucketVersioning"
+                  - "s3:*"
+                Resource: "*"
+              -
+                Effect: "Allow"
+                Action:
+                  - "s3:PutObject"
+                Resource:
+                  - !Join ['', ['arn:aws:s3:::', !Ref 'PipelineBucket', /*]]
+  CodePipeline:
+    Type: "AWS::CodePipeline::Pipeline"
+    Properties:
+      Name: cloudformation
+      ArtifactStore:
+        Type: S3
+        Location: !Ref PipelineBucket
+      DisableInboundStageTransitions:
+        - Ref: AWS::NoValue
+      RestartExecutionOnUpdate: False
+      RoleArn: !GetAtt CodePipelineServiceRole.Arn
+      Stages:
+        -
+          Name: Source
+          Actions:
+            -
+              Name: Source
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Version: 1
+                Provider: CodeCommit
+              OutputArtifacts:
+                -
+                  Name: MyApp
+              Configuration:
+                PollForSourceChanges: True
+                BranchName: master
+                RepositoryName: !Ref "RepositoryName"
+              RunOrder: 1
+        -
+          Name: Build
+          Actions:
+            -
+              Name: CodeBuild
+              InputArtifacts:
+                -
+                  Name: MyApp
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: 1
+                Provider: CodeBuild
+              OutputArtifacts:
+                -
+                  Name: MyAppBuild
+              Configuration:
+                ProjectName: "cloudformation"
+              RunOrder: 1
+  PipelineBucket:
+    Type: "AWS::S3::Bucket"
+Outputs:
+  CodeCommitArn:
+    Value: !GetAtt CodeCommit.Arn
+  CodeCommitHttp:
+    Value: !GetAtt CodeCommit.CloneUrlHttp
+  CodeCommitSsh:
+    Value: !GetAtt CodeCommit.CloneUrlSsh
