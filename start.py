@@ -10,7 +10,7 @@ import yaml
 logger = logging.getLogger(__name__)
 
 def create_s3(stack_name: str):
-    bucket_name = stack_name + '-' + os.environ['CODEBUILD_BUILD_ID']
+    bucket_name = stack_name + '-' + os.environ['CODEBUILD_BUILD_ID'].replace(':', '-').replace('/', '-')
     logger.debug('Create s3 bucket: ' + bucket_name)
     s3 = boto3.resource('s3', region_name=boto3.session.Session().region_name)
     bucket = s3.Bucket(bucket_name)
