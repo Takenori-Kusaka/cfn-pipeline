@@ -4,7 +4,9 @@ phases:
   install:
     commands:
       - echo Install started on `date`
-      - pip3 install cfn-lint cfnexec taskcat
+      - pip3 install cfn-lint
+      - pip3 install cfnexec
+      - pip3 install taskcat
       - gem install cfn-nag
   pre_build:
     commands:
