@@ -58,12 +58,61 @@ Resources:
               - logs:CreateLogStream
               - logs:PutLogEvents
             - Effect: Allow
-              Resource:
-                - !Join ['', ['arn:aws:s3:::', !Ref 'PipelineBucket', /*]]
+              Resource: '*'
               Action:
-              - s3:PutObject
-              - s3:GetObject
-              - s3:GetObjectVersion
+              - s3:CreateBucket
+              - s3:PutBucketTagging
+              - s3:PutAnalyticsConfiguration
+              - s3:PutEncryptionConfiguration
+              - s3:PutBucketCORS
+              - s3:PutInventoryConfiguration
+              - s3:PutLifecycleConfiguration
+              - s3:PutMetricsConfiguration
+              - s3:PutBucketNotification
+              - s3:PutBucketReplication
+              - s3:PutBucketWebsite
+              - s3:PutAccelerateConfiguration
+              - s3:PutBucketPublicAccessBlock
+              - s3:PutReplicationConfiguration
+              - s3:PutObjectAcl
+              - s3:PutBucketObjectLockConfiguration
+              - s3:GetBucketAcl
+              - s3:ListBucket
+              - iam:PassRole
+              - s3:DeleteObject
+              - s3:PutBucketLogging
+              - s3:PutBucketVersioning
+              - s3:PutObjectLockConfiguration
+              - s3:PutBucketOwnershipControls
+              - s3:PutBucketIntelligentTieringConfiguration
+              - s3:PutBucketAcl
+              - s3:PutBucketTagging
+              - s3:PutAnalyticsConfiguration
+              - s3:PutEncryptionConfiguration
+              - s3:PutBucketCORS
+              - s3:PutInventoryConfiguration
+              - s3:PutLifecycleConfiguration
+              - s3:PutMetricsConfiguration
+              - s3:PutBucketNotification
+              - s3:PutBucketReplication
+              - s3:PutBucketWebsite
+              - s3:PutAccelerateConfiguration
+              - s3:PutBucketPublicAccessBlock
+              - s3:PutReplicationConfiguration
+              - s3:PutBucketOwnershipControls
+              - s3:PutBucketIntelligentTieringConfiguration
+              - s3:DeleteBucketWebsite
+              - s3:PutBucketLogging
+              - s3:PutBucketVersioning
+              - s3:PutObjectLockConfiguration
+              - s3:DeleteBucketAnalyticsConfiguration
+              - s3:DeleteBucketCors
+              - s3:DeleteBucketMetricsConfiguration
+              - s3:DeleteBucketEncryption
+              - s3:DeleteBucketLifecycle
+              - s3:DeleteBucketReplication
+              - iam:PassRole
+              - s3:DeleteBucket
             - Effect: Allow
               Resource:
                 - !Join [':', ['arn:aws:codecommit', !Ref "AWS::Region", !Ref "AWS::AccountId", !Ref "RepositoryName"]]

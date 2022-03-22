@@ -146,7 +146,7 @@ def main():
 
     bucket_name = create_s3(config['name'])
     config['created']['bucket_name'] = bucket_name
-    filepath_list = find_cfn_files(Path(config['template']).parent)
+    filepath_list = find_cfn_files(str(Path(config['template']).parent))
     for filepath in filepath_list:
         upload_cfn(filepath)
     param_dict = generate_parameter(config['parameter'], args.s3_bucket_url_parameter_key_name, bucket_name)
