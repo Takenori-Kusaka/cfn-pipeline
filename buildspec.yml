@@ -14,7 +14,7 @@ phases:
     commands:
       - echo Install completed on `date`
       - echo Initialize start on `date`
-      - python3 start.py -c ./config.yml
+      - python3 start.py -c ./config.yml -s3 TemplateS3BucketURL
       - echo Initialize completed on `date`
       - echo cfn-validate start on `date`
       - aws cloudformation validate-template --template-body file://`python3 get_value.py -c  ./config.yml -k template`
