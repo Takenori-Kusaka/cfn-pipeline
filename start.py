@@ -81,7 +81,7 @@ def generate_parameter(param_path: str, s3_bucket_url_parameter_key_name: str, b
         raise('Not support parameter file')
     if s3_bucket_url_parameter_key_name != None:
         for r in list(filter(lambda p: p['ParameterKey'] == s3_bucket_url_parameter_key_name, result)):
-            r['ParameterValue'] = 'http://{}.s3.amazonaws.com'.format(bucket_name)
+            r['ParameterValue'] = 'https://{}.s3.amazonaws.com'.format(bucket_name)
     return result
 
 def create_taskcat_file(config: dict, param_list: list):
