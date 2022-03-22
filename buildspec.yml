@@ -8,6 +8,8 @@ phases:
       - pip3 install cfnexec
       - pip3 install taskcat
       - gem install cfn-nag
+      - $ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/aws-cloudformation/cloudformation-guard/main/install-guard.sh | sh
+      - PATH=~/.guard/bin/
   pre_build:
     commands:
       - echo Install completed on `date`
