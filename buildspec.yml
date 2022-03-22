@@ -14,7 +14,7 @@ phases:
     commands:
       - echo Install completed on `date`
       - echo Initialize start on `date`
-      - python3 start.py -c ./config.yml -s3 TemplateS3BucketURL
+      - python3 start.py -c ./config.yml -s3 `python3 get_value.py -c  ./config.yml -k bucket_url_key`
       - echo Initialize completed on `date`
       - echo cfn-validate start on `date`
       - aws cloudformation validate-template --template-body file://`python3 get_value.py -c  ./config.yml -k template`
@@ -34,7 +34,7 @@ phases:
     commands:
       - echo taskcat completed on `date`
       - echo deploy start on `date`
-      - cfn-exec -n `python3 get_value.py -c  ./config.yml -k name` -i `python3 get_value.py -c  ./config.yml -k template` -p `python3 get_value.py -c  ./config.yml -k parameter`
+      - cfn-exec -n `python3 get_value.py -c  ./config.yml -k name` -i `python3 get_value.py -c  ./config.yml -k template` -p `python3 get_value.py -c  ./config.yml -k parameter` -s3 `python3 get_value.py -c  ./config.yml -k bucket_url_key`
   post_build:
     commands:
       - echo deploy completed on `date`

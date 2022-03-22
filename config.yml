@@ -3,6 +3,7 @@ name: stack-name
 template: ./cfn/input/main.yml
 parameter: ./cfn/param.yml
 bucket_name: ''
+bucket_url_key: 'TemplateS3BucketURL'
 taskcat:
   template: ''
   regions: 
