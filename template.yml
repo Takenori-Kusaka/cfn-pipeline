@@ -136,7 +136,7 @@ Resources:
                   Name: MyApp
               Configuration:
                 PollForSourceChanges: True
-                BranchName: master
+                BranchName: main
                 RepositoryName: !Ref "RepositoryName"
               RunOrder: 1
         -

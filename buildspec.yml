@@ -6,42 +6,32 @@ phases:
       - echo Install started on `date`
       - pip3 install cfn-lint cfnexec taskcat pyyaml awscli
       - gem install cfn-nag
-  initialize:
+  pre_build:
     commands:
       - echo Install completed on `date`
       - echo Initialize start on `date`
       - python3 start.py -c ./config.yml
-  cfnvalidate:
-    commands:
       - echo Initialize completed on `date`
       - echo cfn-validate start on `date`
       - aws cloudformation validate-template --template-body file://`python3 get_value.py -c  ./config.yml -k template`
-  cfnlint:
-    commands:
       - echo cfn-validate completed on `date`
       - echo cfn-lint start on `date`
       - cfn-lint `python3 get_value.py -c  ./config.yml -k template`
-  cfnnag:
-    commands:
       - echo cfn-lint completed on `date`
       - echo cfn-nag start on `date`
       - cfn_nag_scan --input-path `python3 get_value.py -c  ./config.yml -k template`
-  cfnguard:
-    commands:
       - echo cfn-lint completed on `date`
       - echo cfn-nag start on `date`
       - cfn-guard check -t `python3 get_value.py -c  ./config.yml -k template` -r ./rule.ruleset
-  taskcat:
-    commands:
       - echo cfn-nag completed on `date`
       - echo taskcat start on `date`
-      - taskcat test run 
-  deploy:
+      - taskcat test run
+  build:
     commands:
       - echo taskcat completed on `date`
       - echo deploy start on `date`
       - cfn-exec -n example-stack -i `python3 get_value.py -c  ./config.yml -k template` -p `python3 get_value.py -c  ./config.yml -k parameter`
-  post_deploy:
+  post_build:
     commands:
       - echo deploy completed on `date`
       - echo close on `date`
