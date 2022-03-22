@@ -84,11 +84,12 @@ def generate_parameter(param_path: str, s3_bucket_url_parameter_key_name: str, b
             r['ParameterValue'] = 'http://{}.s3.amazonaws.com'.format(bucket_name)
     return result
 
-def create_taskcat_file(config: dict, param_dict: dict):
-    param_path = '.param.json'
+def create_taskcat_file(config: dict, param_list: list):
     config['taskcat']['template'] = config['template']
-    config['taskcat']['parameter'] = param_path
 
+    param = {}
+    for p in param_list:
+        param[p['ParameterKey']] = p['ParameterValue']
     taskcat_dict = {
         'project': {
             'name': config['name']
@@ -96,13 +97,11 @@ def create_taskcat_file(config: dict, param_dict: dict):
         'tests': {
             config['name']: {
                 'template': config['template'],
-                'parameter_input': param_path,
+                'parameters': param,
                 'regions': config['taskcat']['regions']
             }
         }
     }
-    with open(param_path, 'w', encoding='utf-8') as f:
-        json.dump(param_dict, f)
     with open('./.taskcat.yml', 'w', encoding='utf-8') as f:
         yaml.dump(taskcat_dict, f)
 
@@ -148,8 +147,8 @@ def main():
     filepath_list = find_cfn_files(str(Path(config['template']).parent))
     for filepath in filepath_list:
         upload_cfn(bucket_name, filepath)
-    param_dict = generate_parameter(config['parameter'], args.s3_bucket_url_parameter_key_name, bucket_name)
-    create_taskcat_file(config, param_dict)
+    param_list = generate_parameter(config['parameter'], args.s3_bucket_url_parameter_key_name, bucket_name)
+    create_taskcat_file(config, param_list)
 
     logger.info('Successfully to initialize')
 
